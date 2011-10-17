@@ -146,13 +146,19 @@ class NE500PumpNetworkDevice : public IODevice {
 				}
 
                 
+                string dir_str;
                 if(amount >= 0){
-                    sendMessage("DIR INF"); // infuse
+                    dir_str = "INF"; // infuse
                 } else {
                     amount *= -1.0;
-                    sendMessage("DIR WDR"); // withdraw
+                    dir_str = "WDR"; // withdraw
                 }
 
+                boost::format direction_message_format("%s DIR %s"); 
+                string direction_message = (direction_message_format % pump_id % dir_str).str();
+                
+                sendMessage(direction_message); 
+                
 				boost::format rate_message_format("%s RAT %.3f"); 
 				string rate_message = (rate_message_format % pump_id % rate).str();
 				
