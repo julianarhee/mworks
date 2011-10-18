@@ -229,7 +229,7 @@ string NE500PumpNetworkDevice::sendMessage(string message){
 		
 		// give it a moment
 		shared_ptr<Clock> clock = Clock::instance();
-		clock->sleepMS(20);
+		clock->sleepMS(1000);
 		
 		while(true){
 			rc = recv(s, recv_buffer, RECV_BUFFER_SIZE, 0);
