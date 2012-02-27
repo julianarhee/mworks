@@ -72,6 +72,7 @@ void DynamicStimulusDriver::startPlaying() {
 
 void DynamicStimulusDriver::stopPlaying() {
     startTime = NOT_STARTED;
+    didStop();
 }
 
 

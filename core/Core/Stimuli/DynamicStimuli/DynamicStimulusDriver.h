@@ -42,6 +42,8 @@ protected:
     virtual void startPlaying();
     virtual void stopPlaying();
     
+    virtual void didStop(){ }
+    
 	boost::mutex stim_lock;
 	
 private:
