@@ -218,6 +218,35 @@ shared_ptr<Event> SystemEventFactory::setEventForwardingControl(string name, boo
 }
 
 
+
+shared_ptr<Event> SystemEventFactory::clockOffsetEvent(MWTime offset_value){
+    Datum control_datum(offset_value);
+    
+    Datum payload(systemEventPackage(M_SYSTEM_CONTROL_PACKAGE,
+                                     M_CLOCK_OFFSET_EVENT,
+                                     control_datum));
+
+    shared_ptr<Event> ret(new Event(RESERVED_SYSTEM_EVENT_CODE, 
+                                    payload));
+
+	return ret;
+}
+
+
+shared_ptr<Event> SystemEventFactory::connectedEvent(){
+    Datum control_datum(true);
+    
+    Datum payload(systemEventPackage(M_SYSTEM_CONTROL_PACKAGE,
+                                     M_CONNECTED_EVENT,
+                                     control_datum));
+
+    shared_ptr<Event> ret(new Event(RESERVED_SYSTEM_EVENT_CODE, 
+                                    payload));
+
+	return ret;
+}
+
+
 shared_ptr<Event> SystemEventFactory::dataFileOpenControl(std::string  filename, 
 													  DatumFileOptions opt) {
     
@@ -425,9 +454,9 @@ shared_ptr<Event> SystemEventFactory::currentExperimentState() {
 				  itr != end_itr;
 				  ++itr ) {
 				
-				if (fileExtension(itr->filename()) == "xml")
+				if (fileExtension(itr->path().filename().string()) == "xml")
 				{
-					savedVarList.addElement(removeFileExtension(itr->filename()));
+					savedVarList.addElement(removeFileExtension(itr->path().filename().string()));
 				}
 			}
 			

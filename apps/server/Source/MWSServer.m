@@ -30,6 +30,7 @@
 	self = [super init];
 	if (self != nil) {
 		core = boost::shared_ptr <Server>(new Server());
+        Server::registerInstance(core);
 		core_as_esi = static_pointer_cast<EventStreamInterface>(core);
         
 		NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -174,8 +175,7 @@
     [save setCanCreateDirectories:NO];
     if([save runModalForDirectory:nil file:nil] ==
 	   NSFileHandlingPanelOKButton)  {
-		core->saveVariables(boost::filesystem::path([[save filename] cStringUsingEncoding:NSASCIIStringEncoding], 
-													boost::filesystem::native));
+		core->saveVariables(boost::filesystem::path([[save filename] cStringUsingEncoding:NSASCIIStringEncoding]));
     }
 	
 	[save release];	
@@ -193,8 +193,7 @@
         NSEnumerator * fileEnum = [fn objectEnumerator];
         NSString * filename;
         while(filename = [fileEnum nextObject]) {			
-			core->loadVariables(boost::filesystem::path([filename cStringUsingEncoding:NSASCIIStringEncoding], 
-														boost::filesystem::native));
+			core->loadVariables(boost::filesystem::path([filename cStringUsingEncoding:NSASCIIStringEncoding]));
         }
     }
 	

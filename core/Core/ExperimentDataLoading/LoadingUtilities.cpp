@@ -230,7 +230,7 @@ namespace mw {
 		boost::filesystem::path full_path;
 		
 		try {
-			specific_path = boost::filesystem::path(path, boost::filesystem::native);
+			specific_path = boost::filesystem::path(path);
 		} catch(std::exception& e){
 			cerr << "bad path" << endl;
 		}
@@ -240,7 +240,7 @@ namespace mw {
 		} else {
 			try{
 				
-				boost::filesystem::path working_path(working_directory, boost::filesystem::native);
+				boost::filesystem::path working_path(working_directory);
 				full_path = working_path / specific_path;
 			} catch(std::exception& e){
 				cerr << "bad path" << endl;
@@ -268,9 +268,10 @@ namespace mw {
     
 		bool always_display_mirror_window = 0;
 		int display_to_use = 0;
+        bool use_virtual_tangent_screen = 0;
 		if(main_screen_info != NULL){
 			
-		 Datum val = *(main_screen_info);
+            Datum val = *(main_screen_info);
 			if(val.hasKey(M_DISPLAY_TO_USE_KEY)){
 				display_to_use = (int)val.getElement(M_DISPLAY_TO_USE_KEY);
 			}
@@ -278,9 +279,22 @@ namespace mw {
 			if(val.hasKey(M_ALWAYS_DISPLAY_MIRROR_WINDOW_KEY)){
 				always_display_mirror_window = (bool)val.getElement(M_ALWAYS_DISPLAY_MIRROR_WINDOW_KEY);
 			}
+            
+            if(val.hasKey(M_USE_VIRTUAL_TANGENT_SCREEN_KEY)){
+                use_virtual_tangent_screen = (bool)val.getElement(M_USE_VIRTUAL_TANGENT_SCREEN_KEY);
+            }
 		}
 		
-		shared_ptr<StimulusDisplay> stimdisplay(new StimulusDisplay());
+        shared_ptr<StimulusDisplay> stimdisplay;
+        
+        if(use_virtual_tangent_screen){
+            stimdisplay = shared_ptr<StimulusDisplay>(new VirtualTangentScreenDisplay());
+        } else {
+            stimdisplay = shared_ptr<StimulusDisplay>(new StimulusDisplay());
+        }
+        
+        stimdisplay->initialize();
+        
 		int new_context = -1;
         
         
@@ -388,7 +402,7 @@ namespace mw {
         for (bf::directory_iterator iter(dirPath); iter != endIter; iter++) {
             // Include only regular files whose names don't start with "."
             if (bf::is_regular_file(iter->status()) &&
-                (iter->path().filename().find(bf::dot<bf::path>::value) != 0))
+                (iter->path().filename().string().find(".") != 0))
             {
                 filePaths.push_back(iter->path().string());
             }

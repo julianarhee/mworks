@@ -14,9 +14,8 @@ import sys
 ################################################################################
 
 
-gcc_version = '4.2'
-gcc = '/Developer/usr/bin/gcc-' + gcc_version
-gplusplus = '/Developer/usr/bin/g++-' + gcc_version
+gcc = '/Developer/usr/bin/gcc'
+gplusplus = '/Developer/usr/bin/g++'
 
 sdk_version = '10.6'
 sdk_root = '/Developer/SDKs/MacOSX%s.sdk' % sdk_version
@@ -133,7 +132,7 @@ def run_configure_and_make(
 
 @builder
 def boost():
-    version = '1.45.0'
+    version = '1.47.0'
     srcdir = 'boost_' + version.replace('.', '_')
     tarfile = srcdir + '.tar.bz2'
 
@@ -150,7 +149,7 @@ def boost():
             '--prefix=' + path_to_stagedir,
             ])
         check_call([
-            './bjam',
+            './b2',
             'optimization=space',
             'debug-symbols=on',
             'inlining=on',
@@ -167,11 +166,11 @@ def boost():
 
 @builder
 def libpng():
-    version = '1.2.44'
+    version = '1.2.46'
     srcdir = 'libpng-' + version
     tarfile = srcdir + '.tar.bz2'
 
-    download_tarfile_from_sf('libpng/libpng12/older-releases', version, tarfile)
+    download_tarfile_from_sf('libpng/libpng12', version, tarfile)
     unpack_tarfile(tarfile, srcdir)
 
     run_configure_and_make(srcdir)
@@ -179,7 +178,7 @@ def libpng():
 
 @builder
 def jpeg():
-    version = '8b'
+    version = '8d'
     srcdir = 'jpeg-' + version
     tarfile = 'jpegsrc.v%s.tar.gz' % version
 
@@ -222,7 +221,7 @@ def libmng():
 
 @builder
 def tiff():
-    version = '3.9.4'
+    version = '3.9.5'
     srcdir = 'tiff-' + version
     tarfile = srcdir + '.tar.gz'
 
