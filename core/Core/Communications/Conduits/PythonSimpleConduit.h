@@ -170,23 +170,8 @@ class PythonIPCPseudoConduit {
     }
     
     
-    virtual mw::Datum packagePyObject(PyObject *pyobj){
-    
-        if(PyFloat_Check(pyobj)){
-            return mw::Datum(PyFloat_AsDouble(pyobj));
-        } else if(PyInt_Check(pyobj)){
-            return mw::Datum(PyInt_AsLong(pyobj));
-        } else if(PyString_Check(pyobj)){
-            return mw::Datum(PyString_AsString(pyobj));
-        } else if(PyMapping_Check(pyobj)){
-            return packagePyMapping(pyobj);
-        } else if(PySequence_Check(pyobj)){
-            return packagePySequence(pyobj);
-        }
-
-        return mw::Datum();
-    }
-           
+    virtual mw::Datum packagePyObject(PyObject *pyobj);
+               
     virtual mw::Datum packagePySequence(PyObject *pyobj){
         
         int size = PySequence_Size(pyobj);
@@ -206,13 +191,14 @@ class PythonIPCPseudoConduit {
         mw::Datum dict_datum(M_DICTIONARY, size);
         
         PyObject *keys = PyMapping_Keys(pyobj);
-        PyObject *items = PyMapping_Items(pyobj);
+        PyObject *values = PyMapping_Values(pyobj);
         
         for(int i = 0; i < size; i++){
             PyObject *key = PySequence_GetItem(keys,i);
-            PyObject *item = PySequence_GetItem(items, i);
-            
-            dict_datum.setElement(packagePyObject(key), packagePyObject(item));
+            PyObject *value = PySequence_GetItem(values, i);
+            Datum key_datum = packagePyObject(key);
+            Datum value_datum = packagePyObject(value);
+            dict_datum.addElement(key_datum, value_datum);
         }
         
         return dict_datum;

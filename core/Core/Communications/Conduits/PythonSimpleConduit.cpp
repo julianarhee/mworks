@@ -71,6 +71,25 @@ PyObject *convert_scarab_to_python(ScarabDatum *datum){
     }
 }
 
+
+mw::Datum PythonIPCPseudoConduit::packagePyObject(PyObject *pyobj){
+
+    if(PyFloat_Check(pyobj)){
+        return mw::Datum(PyFloat_AsDouble(pyobj));
+    } else if(PyInt_Check(pyobj)){
+        return mw::Datum(PyInt_AsLong(pyobj));
+    } else if(PyString_Check(pyobj)){
+        return mw::Datum(std::string(PyString_AsString(pyobj)));
+    } else if(PyMapping_Check(pyobj)){
+        return packagePyMapping(pyobj);
+    } else if(PySequence_Check(pyobj)){
+        return packagePySequence(pyobj);
+    }
+
+    return mw::Datum();
+}
+
+
 PyObject *convert_datum_to_python(Datum datum){
     return convert_scarab_to_python(datum.getScarabDatum());
 }
