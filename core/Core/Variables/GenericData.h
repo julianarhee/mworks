@@ -77,7 +77,7 @@ namespace mw {
             Datum(const stx::AnyScalar);
 			
         
-        Datum( map<int, string> dict){
+            Datum( map<int, string> dict){
                 
                 int size = dict.size();
                 createDictionary(size);
