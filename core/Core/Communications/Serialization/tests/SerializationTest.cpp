@@ -32,6 +32,8 @@ void SerializationTestFixture::testEventSerialization(){
     Datum the_data((double)4.0);
     Event event(1, the_data);
     
+    MWTime t = event.getTime();
+    
     ostringstream output_stream_;
     
     boost::archive::text_oarchive serialized_archive(output_stream_);
@@ -52,6 +54,10 @@ void SerializationTestFixture::testEventSerialization(){
     
     CPPUNIT_ASSERT(the_data.getDataType() == the_regurgitated_data.getDataType());
     CPPUNIT_ASSERT(the_data.getFloat() == the_regurgitated_data.getFloat());
+    
+    MWTime received_time = event2.getTime();
+    
+    CPPUNIT_ASSERT(t == received_time);
 
 }
 
