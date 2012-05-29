@@ -11,6 +11,8 @@
 #include "SystemEventFactory.h"
 #include "StandardVariables.h"
 
+#define CHATTY_CONDUIT
+
 using namespace mw;
 
 SimpleConduit::SimpleConduit(shared_ptr<EventTransport> _transport, 
@@ -178,6 +180,11 @@ void SimpleConduit::handleSystemEvent(shared_ptr<Event> evt){
             if((int)payload_type == M_CLOCK_OFFSET_EVENT){
                 remote_clock_offset = clk->getSystemReferenceTime() - (MWTime)evt->getData().getElement(M_SYSTEM_PAYLOAD);
                 
+                #ifdef CHATTY_CONDUIT
+                    fprintf(stderr, "Remote clock base time (from conduit): %lld\n", (MWTime)evt->getData().getElement(M_SYSTEM_PAYLOAD));
+                    fprintf(stderr, "Remote clock offset: %lld\n", remote_clock_offset);
+                    fflush(stderr);
+                #endif
             }
             break;
         case M_CONNECTED_EVENT:

@@ -20,9 +20,12 @@
 #include <boost/scope_exit.hpp>
 #include <boost/format.hpp>
 
+#include <time.h>
+
 #include "Clock.h"
 
 #import <Foundation/Foundation.h>
+
 
 using namespace mw;
 
@@ -232,10 +235,9 @@ void XMLParser::parse(bool announce_progress){
 	
 	// TODO: destroy exisiting resources
     
+    time_t thetime = time(NULL);
     
-    shared_ptr<Clock> clock = Clock::instance();
-    
-    string timestamp = (boost::format("'%d_'") % clock->getCurrentTimeMS()).str();
+    string timestamp = (boost::format("'%d_'") % thetime).str();
     
     const char *params[3];
     params[0] = "uid";

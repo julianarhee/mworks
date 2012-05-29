@@ -134,6 +134,10 @@ extern shared_ptr<Variable> serverName;
 #define EXPERIMENT_LOAD_PROGRESS_TAGNAME	"#experimentLoadProgress"
 extern shared_ptr<Variable> experimentLoadProgress;
 
+#define USE_SESSION_START_AS_BASE_TIME_TAGNAME  "#sessionStartAsBaseTime"
+extern shared_ptr<Variable> useSessionStartAsBaseTime;
+
+
 extern shared_ptr<Variable> beamPosition;		// DDC added as an experiment, Aug 2006
 
 /*        sampleSource,
@@ -154,6 +158,7 @@ extern shared_ptr<Variable> beamPosition;		// DDC added as an experiment, Aug 20
 #define	MAIN_SCREEN_INFO_TAGNAME        "#mainScreenInfo"
 #define WARN_ON_SKIPPED_REFRESH_TAGNAME "#warnOnSkippedRefresh"
 #define ALT_FAILOVER_TAGNAME            "#allowAltFailover"
+
 
 #define M_DISPLAY_WIDTH_KEY					"width"
 #define M_DISPLAY_HEIGHT_KEY				"height"

@@ -43,10 +43,23 @@ namespace mw {
 	shared_ptr<Variable> experimentLoadProgress;
     
     shared_ptr<Variable> alt_failover;
+    
+    shared_ptr<Variable> useSessionStartAsBaseTime;
 
 	
 	void initializeStandardVariables(shared_ptr<VariableRegistry> registry) {
 		
+        
+        useSessionStartAsBaseTime = registry->createGlobalVariable( new VariableProperties(new Datum((bool)true),
+                                                                                            USE_SESSION_START_AS_BASE_TIME_TAGNAME,
+                                                                                            "use session start as base time", 
+                                                                                            "use session start as base time",
+                                                                                            M_WHEN_CHANGED,
+                                                                                            M_WHEN_CHANGED,
+                                                                                            true,
+                                                                                            false,
+                                                                                            M_DISCRETE_BOOLEAN,
+                                                                                            PRIVATE_SYSTEM_VARIABLES) );
         
         alt_failover = registry->createGlobalVariable( new VariableProperties( new Datum((bool)true), 
                                                                                    ALT_FAILOVER_TAGNAME, 

@@ -76,6 +76,10 @@ public:
     // A special callback to handle important system events from the other side of the conduit
     virtual void handleSystemEvent(shared_ptr<Event> evt);
     
+    virtual MWTime getRemoteClockOffset(){
+        return remote_clock_offset;
+    }
+    
 };
 
     

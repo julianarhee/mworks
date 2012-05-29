@@ -56,7 +56,12 @@ StandardClock::StandardClock(long interval_microseconds)
     //cv = ((long double) tTBI.numer) / ((long double) tTBI.denom);
 	//fprintf(stderr, "cv = %llu", cv);fflush(stderr);
     //#endif
-	baseTime = mach_absolute_time();
+    
+    if(useSessionStartAsBaseTime->getValue()){
+        baseTime = mach_absolute_time();
+    } else {
+        baseTime = 0LL;
+    }
 }
 
 MWTime StandardClock::getSystemTimeMS() {
