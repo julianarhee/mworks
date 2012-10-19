@@ -18,6 +18,8 @@
 
 #include <MWorksCore/StandardStimuli.h>
 
+#include <algorithm>
+
 
 const std::string DriftingGratingStimulus::DIRECTION("direction");
 const std::string DriftingGratingStimulus::STARTING_PHASE("starting_phase");
@@ -238,7 +240,8 @@ void DriftingGratingStimulus::unload(shared_ptr<StimulusDisplay> display) {
 
 void DriftingGratingStimulus::drawFrame(shared_ptr<StimulusDisplay> display) {
 	glPushMatrix();	
-    display->translate2D(xoffset->getValue().getFloat(), yoffset->getValue().getFloat());
+
+    	display->translate2D(xoffset->getValue().getFloat(), yoffset->getValue().getFloat());
 	display->rotateInPlane2D(rotation->getValue().getFloat());
 	GLfloat scale_size = MAX(width->getValue().getFloat(), height->getValue().getFloat());
 	display->scale2D(scale_size, scale_size); // scale it up		
@@ -341,8 +344,8 @@ void DriftingGratingStimulus::drawFrame(shared_ptr<StimulusDisplay> display) {
 		const float texture_tr = 1+d;
 		const float texture_tl = texture_bl+g;
 		
-		const float mask_s_ratio = 1-MIN(1,aspect);
-		const float mask_t_ratio = 1-MIN(1,1/aspect);
+		const float mask_s_ratio = 1-std::min(1.0,aspect);
+		const float mask_t_ratio = 1-std::min(1.0,1.0/aspect);
 		
 		const float phase_proportion = phase/(2*M_PI);
 		const float cycle_proportion = spatial_frequency->getValue().getFloat()*width->getValue().getFloat();
