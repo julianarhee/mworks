@@ -97,7 +97,7 @@ namespace mw {
 
 // ======================================================  
 // defines for state system modes
-enum {IDLE, STOPPING, RUNNING, TASKMODES};	
+enum {IDLE, STOPPING, RUNNING, PAUSED, TASKMODES};	
 
 
 
@@ -167,7 +167,9 @@ extern shared_ptr<Variable> beamPosition;		// DDC added as an experiment, Aug 20
 #define M_DISPLAY_X_OFFSET_KEY              "horizontal_offset"
 #define M_DISPLAY_Y_OFFSET_KEY              "vertical_offset"
 
-extern shared_ptr<Variable> mainDisplayInfo;		
+#define M_REDRAW_ON_EVERY_REFRESH_KEY		"redraw_on_every_refresh"
+
+extern shared_ptr<Variable> mainDisplayInfo;
 extern shared_ptr<Variable> warnOnSkippedRefresh;		
 extern shared_ptr<Variable> alt_failover;
 
@@ -184,5 +186,5 @@ extern shared_ptr<Variable> debuggerStep;
         
 void initializeStandardVariables(shared_ptr<VariableRegistry> registry);
 }
-#endif STANDARD_VARIABLES_H
+#endif /* STANDARD_VARIABLES_H */
 

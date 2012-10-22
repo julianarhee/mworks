@@ -108,7 +108,7 @@
 @property BOOL serverConnected;
 @property BOOL serverConnecting;
 @property(copy, readwrite) NSString *serverName;
-@property(copy, readwrite) NSString *serverURL;
+@property(nonatomic, copy, readwrite) NSString *serverURL;
 @property(copy, readwrite) NSNumber *serverPort;
 @property BOOL launchIfNeeded;
 
@@ -198,6 +198,7 @@
 - (void)updateRecentExperiments;
 
 - (void)toggleExperimentRunning:(id)running;
+- (void)toggleExperimentPaused:(id)paused;
 						  
 - (void) loadVariableSet;
 - (void) saveVariableSet;

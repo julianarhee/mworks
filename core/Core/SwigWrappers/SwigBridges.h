@@ -23,10 +23,12 @@
 #include "RandomWORSelection.h"
 #include "RandomWithReplacementSelection.h"
 #include "ScheduledActions.h"
-namespace mw {
-using namespace boost;
 
-#define	DEF_CAST_SHARED_PTR(X,Y,NAME)	shared_ptr<X> NAME(shared_ptr<Y> ptr){ return dynamic_pointer_cast<X,Y>(ptr); }
+
+BEGIN_NAMESPACE_MW
+
+
+#define	DEF_CAST_SHARED_PTR(X,Y,NAME)	shared_ptr<X> NAME(shared_ptr<Y> ptr){ return boost::dynamic_pointer_cast<X,Y>(ptr); }
 #define DEF_GET_RAW(X)	X *get_raw_pointer(shared_ptr<X> ptr){ return ptr.get(); }
 #define DEF_SHARED_PTR(X)	shared_ptr<X> create_shared_ptr(X *arg){ return shared_ptr<X>(arg); }
 #define DEF_SHARED_PTR_LITERAL(X,Y) shared_ptr<X> create_shared_ptr(Y *arg){ return shared_ptr<X>(arg); }
@@ -176,8 +178,8 @@ DEF_CAST_SHARED_PTR(Trial, State,	castStateAsTrialPtr);
 DEF_CAST_RAW_PTR(Experiment, State,		castStateAsExperiment);
 DEF_CAST_SHARED_PTR(Experiment, State,	castStateAsExperimentPtr);
 
-DEF_CAST_RAW_PTR(GenericListState, State,		castStateAsGenericListState);
-DEF_CAST_SHARED_PTR(GenericListState, State,	castStateAsGenericListStatePtr);
+DEF_CAST_RAW_PTR(ListState, State,		castStateAsGenericListState);
+DEF_CAST_SHARED_PTR(ListState, State,	castStateAsGenericListStatePtr);
 
 
 DEF_SHARED_PTR(Action);
@@ -191,7 +193,6 @@ DEF_GET_RAW(ScheduledActions);
 
 
 DEF_GET_RAW(ListState)
-DEF_GET_RAW(GenericListState)
 DEF_GET_RAW(Trial)
 DEF_GET_RAW(Block)
 
@@ -259,7 +260,8 @@ DEF_GET_RAW(Stimulus);
 
 DEF_CAST_RAW_PTR(ScopedVariableEnvironment,  Experiment,  castAsScopedVariableEnvironment);
 
-}
+
+END_NAMESPACE_MW
 
 
 

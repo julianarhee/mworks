@@ -11,7 +11,10 @@
 #define CODEC_AWARE_CONDUIT_H_
 
 #include "SimpleConduit.h"
-using namespace mw;
+
+
+BEGIN_NAMESPACE_MW
+
 
 #define name_defined_callback_key   "CodeAwareConduit::name_defined_callback_key"
 
@@ -23,7 +26,7 @@ using namespace mw;
 // Additionally, it receives codecs coming from the conduit so that
 // it is possible to register for event callbacks by name rather than
 // code
-class CodecAwareConduit : public SimpleConduit, public enable_shared_from_this<CodecAwareConduit> {
+class CodecAwareConduit : public SimpleConduit, public boost::enable_shared_from_this<CodecAwareConduit> {
     
 protected:
     boost::recursive_mutex conduit_mutex;
@@ -75,5 +78,9 @@ public:
     map<string, int> getRemoteReverseCodec();
 
 };
+
+
+END_NAMESPACE_MW
+
 
 #endif

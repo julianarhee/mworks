@@ -9,7 +9,6 @@
 #include "Event.h"
 #include "LoadingUtilities.h"
 #include "Experiment.h"
-#include "EmbeddedPerlInterpreter.h"
 #include "PlatformDependentServices.h"
 #include "SystemEventFactory.h"
 #include "EventBuffer.h"
@@ -25,10 +24,10 @@
 #include "ComponentRegistry.h"
 #include "XMLParser.h"
 #include "DataFileManager.h"
-using namespace mw;
 
 
-namespace mw {
+BEGIN_NAMESPACE_MW
+
 
 // DDC: HOLY CRAP: WHY WAS HE QUIETLY REPLACING MISSING VALUES WITH DEFAULTS?!?
 // Datum checkLoadedValueAndReturnNewValuesWithLoadedValueOrDefaultIfNotNumber(const Datum main_window_values, 
@@ -259,7 +258,7 @@ namespace mw {
         shared_ptr<OpenGLContextManager> opengl_context_manager = OpenGLContextManager::instance(false);
         if(opengl_context_manager == NULL){
             opengl_context_manager = shared_ptr<OpenGLContextManager>(new OpenGLContextManager()); 
-            OpenGLContextManager::registerInstance(dynamic_pointer_cast<OpenGLContextManager, Component>(opengl_context_manager));
+            OpenGLContextManager::registerInstance(boost::dynamic_pointer_cast<OpenGLContextManager, Component>(opengl_context_manager));
 		}
         //opengl_context_manager->releaseDisplays();
 		
@@ -269,6 +268,8 @@ namespace mw {
 		bool always_display_mirror_window = 0;
 		int display_to_use = 0;
         bool use_virtual_tangent_screen = 0;
+
+        bool redraw_on_every_refresh = true;
 		if(main_screen_info != NULL){
 			
             Datum val = *(main_screen_info);
@@ -283,18 +284,24 @@ namespace mw {
             if(val.hasKey(M_USE_VIRTUAL_TANGENT_SCREEN_KEY)){
                 use_virtual_tangent_screen = (bool)val.getElement(M_USE_VIRTUAL_TANGENT_SCREEN_KEY);
             }
+            
+            if(val.hasKey(M_REDRAW_ON_EVERY_REFRESH_KEY)){
+				redraw_on_every_refresh = (bool)val.getElement(M_REDRAW_ON_EVERY_REFRESH_KEY);
+			}
 		}
 		
         shared_ptr<StimulusDisplay> stimdisplay;
         
         if(use_virtual_tangent_screen){
-            stimdisplay = shared_ptr<StimulusDisplay>(new VirtualTangentScreenDisplay());
+            stimdisplay = shared_ptr<StimulusDisplay>(new VirtualTangentScreenDisplay(redraw_on_every_refresh));
         } else {
-            stimdisplay = shared_ptr<StimulusDisplay>(new StimulusDisplay());
+            stimdisplay = shared_ptr<StimulusDisplay>(new StimulusDisplay(redraw_on_every_refresh));
         }
         
-        stimdisplay->initialize();
+        // TODO: what was this doing...?
+        //stimdisplay->initialize();
         
+			
 		int new_context = -1;
         
         
@@ -412,7 +419,9 @@ namespace mw {
             throw SimpleException("Directory contains no regular files", directoryPath);
         }
     }
-}
+
+
+END_NAMESPACE_MW
 
 
 

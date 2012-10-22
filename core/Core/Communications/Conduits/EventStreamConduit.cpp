@@ -63,7 +63,10 @@
 #include "SystemEventFactory.h"
 #include "StandardVariables.h"
 
-using namespace mw;
+#include <functional>
+
+
+BEGIN_NAMESPACE_MW
 
 
 int EventStreamConduit::count = 0;
@@ -152,7 +155,7 @@ void EventStreamConduit::handleControlEventFromConduit(shared_ptr<Event> evt){
     
     
     boost::mutex::scoped_lock lock(events_to_forward_lock);
-    list<string>::iterator event_iterator = find_if(events_to_forward.begin(), events_to_forward.end(), bind2nd(equal_to<string>(),event_name));
+    std::list<string>::iterator event_iterator = find_if(events_to_forward.begin(), events_to_forward.end(), bind2nd(std::equal_to<string>(),event_name));
     
     if(state_datum.getBool()){
         if(event_iterator == events_to_forward.end()){
@@ -171,7 +174,7 @@ void EventStreamConduit::handleControlEventFromConduit(shared_ptr<Event> evt){
 
 
 void EventStreamConduit::rebuildStreamToConduitForwarding(){
-    list<string>::iterator i;
+    std::list<string>::iterator i;
     
     //std::cerr << "rebuilding stream to conduit forwarding" << std::endl;
     
@@ -238,3 +241,6 @@ void EventStreamConduit::serviceIncomingEventsFromConduit(){
         
     }
 }
+
+
+END_NAMESPACE_MW

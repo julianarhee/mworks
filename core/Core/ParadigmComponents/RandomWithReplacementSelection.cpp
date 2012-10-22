@@ -11,7 +11,9 @@
 #include "Clock.h"
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/variate_generator.hpp>
-using namespace mw;
+
+
+BEGIN_NAMESPACE_MW
 
 
 RandomWithReplacementSelection::RandomWithReplacementSelection(int _n_draws, bool _autoreset) 
@@ -24,7 +26,7 @@ RandomWithReplacementSelection::~RandomWithReplacementSelection() { }
 
 shared_ptr <Selection> RandomWithReplacementSelection::clone(){
 	shared_ptr <RandomWithReplacementSelection> newsel = shared_ptr<RandomWithReplacementSelection>(new RandomWithReplacementSelection(*this));
-	return dynamic_pointer_cast<Selection, RandomWithReplacementSelection>(newsel);
+	return boost::dynamic_pointer_cast<Selection, RandomWithReplacementSelection>(newsel);
 }
 
 int RandomWithReplacementSelection::draw() {
@@ -63,5 +65,4 @@ void RandomWithReplacementSelection::rejectSelections() {
 }
 
 
-
-
+END_NAMESPACE_MW

@@ -22,6 +22,10 @@
 #include <map>
 #include <string>
 
+using boost::error_info;
+using boost::shared_ptr;
+using boost::variant;
+using std::string;
 
 
 
@@ -32,9 +36,6 @@ class Stimulus;
 class Variable;
 class StimulusGroup;
 class Component;
-
-using namespace std;
-using namespace boost;
 
 // fwd dec
 class Component;
@@ -117,7 +118,12 @@ class InvalidXMLException : public SimpleException{
 	
 	public:
 	
-	InvalidXMLException(string _refid, string _message, string _subject = "") :
+	InvalidXMLException(string _refid, string _message) :
+        SimpleException(M_PARSER_MESSAGE_DOMAIN, _message),
+        reference_id(_refid)
+    { }
+	
+	InvalidXMLException(string _refid, string _message, string _subject) :
 				SimpleException(M_PARSER_MESSAGE_DOMAIN, _message, _subject){
 					
 		reference_id = _refid;
@@ -208,7 +214,7 @@ namespace error_info_types{
     typedef  variant<shared_ptr<StimulusGroup>, string> StimulusGroupOrString;
     typedef  variant<shared_ptr<Variable>, string>      VariableOrString;
     typedef  variant< string >                          ErrorString;
-    typedef  variant< map<string, string> , string>     ComponentAttributeMap;
+    typedef  variant< std::map<string, string> , string>     ComponentAttributeMap;
     typedef  variant< int, double >                     ErrorNumber;
 }
 

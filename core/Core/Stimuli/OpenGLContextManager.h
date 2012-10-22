@@ -48,10 +48,6 @@ namespace mw {
         
         IOPMAssertionID         display_sleep_block;
 		
-		
-		GLuint					synchronization_fence;
-		shared_ptr<ScheduleTask>			beamNode;
-		
 		int						main_display_index;
 		
         NSScreen                *_getScreen(const int screen_number);
@@ -59,7 +55,6 @@ namespace mw {
         void                    _measureDisplayRefreshRate(int index);
         
         bool glew_initialized;
-        bool has_fence;
         
         void _initGlew(){
             
@@ -111,15 +106,10 @@ namespace mw {
         void flush(int context_id, bool update=false);
         void flushCurrent();
 		
-        bool hasFence(){   return has_fence; }
-		GLuint getFence(){  return synchronization_fence; }
-		GLuint *getFencePointer(){ return &synchronization_fence; }
-		
         REGISTERED_SINGLETON_CODE_INJECTION(OpenGLContextManager)
         
 	};
 	
-	extern OpenGLContextManager *GlobalOpenGLContextManager;
 }
 
 #endif  

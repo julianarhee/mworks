@@ -17,11 +17,8 @@ import sys
 ################################################################################
 
 
-mw_developer_dir = '/Library/Application Support/MWorks/Developer/'
-mw_bin_dir = mw_developer_dir + 'bin/'
-mw_xcode_dir = mw_developer_dir + 'Xcode/'
-
-mw_xcodebuild = mw_bin_dir + 'mw_xcodebuild'
+mw_xcodebuild = ('/Library/Application Support/MWorks/Developer/bin/'
+                 'mw_xcodebuild')
 
 mw_xcode_configuration = 'Development'
 mw_version = 'CUSTOM'
@@ -92,15 +89,7 @@ def xcodebuild(target='Everything'):
 
 
 def make(targets=[]):
-    check_call(
-        args = [
-            '/usr/bin/make',
-            'XCCONFIG_DIR=' + mw_xcode_dir.replace(' ', '\ ').rstrip('/'),
-            'XCCONFIG_NAME=' + mw_xcode_configuration,
-            'MW_VERSION=' + mw_version,
-            'MW_XCODEBUILD=' + mw_xcodebuild,
-            ] + targets,
-        )
+    check_call(['/usr/bin/xcrun', 'make'] + targets)
 
 
 ################################################################################
@@ -110,17 +99,17 @@ def make(targets=[]):
 ################################################################################
 
 
-@builder('mworks/build/new_installer')
+@builder('mworks/build/installer')
 def uninstall():
-    check_call(['./uninstall_mworks', '--delete'])
+    check_call(['./uninstall_mworks', '--delete', '--no-sudo'])
 
 
-@builder('mworks/build/xcode_config', required=True)
+@builder('mworks/build/xcode', required=True)
 def build_requirements():
     make()
 
 
-@builder('mworks/build/supporting_libs')
+@builder('mworks/supporting_libs')
 def supporting_libs():
     check_call(['./build_supporting_libs'])
 
@@ -137,12 +126,9 @@ def core():
 
 @builder('mworks/tools/data')
 def data_tools():
-    for subdir in ('DataFileIndexer', 'MWorksStreamUtilities'):
+    for subdir in ('DataFileIndexer', 'MATLABTools'):
         with workdir(subdir):
             xcodebuild()
-
-    with workdir('MatlabDataReader'):
-        make(['clean', 'install'])
 
 
 @builder('mworks/plugins/core')
@@ -204,7 +190,7 @@ def examples():
     make()
 
 
-@builder('mworks/xcode')
+#@builder('mworks/xcode')
 def xcode_templates():
     make(['test', 'install'])
 
@@ -224,17 +210,30 @@ def main():
                       dest = 'mw_version',
                       default = mw_version,
                       help = 'MWorks version number [default: %default]')
+    parser.add_option('--start-with',
+                      dest = 'first_builder',
+                      metavar = 'BUILDER_NAME',
+                      help = 'Start build from given builder')
 
     (options, requested_builders) = parser.parse_args()
     mw_version = options.mw_version
 
     all_builder_names = [builder.__name__ for builder in all_builders]
 
-    unknown_builders = [name for name in requested_builders
-                        if (name not in all_builder_names)]
-    if unknown_builders:
-        parser.error('unknown builders: ' +
-                     ', '.join(repr(name) for name in unknown_builders))
+    if options.first_builder:
+        if requested_builders:
+            parser.error('cannot specify builder names when using --start-with')
+        first_builder = options.first_builder
+        if first_builder not in all_builder_names:
+            parser.error('unknown builder: ' + first_builder)
+        requested_builders = \
+            all_builder_names[all_builder_names.index(first_builder):]
+    else:
+        unknown_builders = [name for name in requested_builders
+                            if (name not in all_builder_names)]
+        if unknown_builders:
+            parser.error('unknown builders: ' +
+                         ', '.join(repr(name) for name in unknown_builders))
 
     srcroot = os.path.abspath(os.path.dirname(__file__) + '/../..')
 

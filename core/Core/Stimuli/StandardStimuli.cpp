@@ -162,7 +162,7 @@ void BasicTransformStimulus::draw(shared_ptr<StimulusDisplay>  display,float x, 
 Datum BasicTransformStimulus::getCurrentAnnounceDrawData() {
     
     Datum announceData(M_DICTIONARY, 8);
-    announceData.addElement(STIM_NAME,tag);        // char
+    announceData.addElement(STIM_NAME,getTag());        // char
     announceData.addElement(STIM_ACTION,STIM_ACTION_DRAW);
     announceData.addElement(STIM_TYPE,STIM_TYPE_BASICTRANSFORM);  
     announceData.addElement(STIM_POSX,last_posx);  
@@ -221,7 +221,7 @@ void BlankScreen::draw(shared_ptr<StimulusDisplay> display) {
 Datum BlankScreen::getCurrentAnnounceDrawData() {
     
     Datum announceData(M_DICTIONARY, 6);
-    announceData.addElement(STIM_NAME,tag);        // char
+    announceData.addElement(STIM_NAME,getTag());        // char
     announceData.addElement(STIM_ACTION,STIM_ACTION_DRAW);
     announceData.addElement(STIM_TYPE,STIM_TYPE_BLANK);  
     announceData.addElement(STIM_COLOR_R,last_r);  
@@ -302,7 +302,10 @@ void DevILImageLoader::load(const std::string &filename, int &width, int &height
     height = ilGetInteger(IL_IMAGE_HEIGHT);
 
     // Compute the SHA-1 message digest of the raw file data, convert it to a hex string, and copy it to fileHash
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     unsigned char *hash = SHA1((unsigned char*)[imageData bytes], [imageData length], NULL);
+#pragma clang diagnostic pop
     std::ostringstream os;
     os.fill('0');
     os << std::hex;
@@ -508,7 +511,7 @@ Datum ImageStimulus::getCurrentAnnounceDrawData() {
     //mprintf("getting announce DRAW data for image stimulus %s",tag );
     
     Datum announceData(M_DICTIONARY, 10);
-    announceData.addElement(STIM_NAME,tag);        // char
+    announceData.addElement(STIM_NAME,getTag());        // char
     announceData.addElement(STIM_ACTION,STIM_ACTION_DRAW);
     announceData.addElement(STIM_TYPE,STIM_TYPE_IMAGE);
     announceData.addElement(STIM_FILENAME,filename);  
@@ -603,7 +606,7 @@ Datum PointStimulus::getCurrentAnnounceDrawData() {
     //mprintf("getting announce DRAW data for point stimulus %s",tag );
     
     Datum announceData(M_DICTIONARY, 11);
-    announceData.addElement(STIM_NAME,tag);        // char
+    announceData.addElement(STIM_NAME,getTag());        // char
     announceData.addElement(STIM_ACTION,STIM_ACTION_DRAW);
     announceData.addElement(STIM_TYPE,STIM_TYPE_POINT);
     announceData.addElement(STIM_POSX,last_posx);  

@@ -12,7 +12,9 @@
 
 #include <boost/random.hpp>
 #include "Clock.h"
-using namespace mw;
+
+
+BEGIN_NAMESPACE_MW
 
 
 RandomWORSelection::RandomWORSelection(int _n_draws, bool _autoreset) : Selection(_n_draws, _autoreset){
@@ -41,7 +43,7 @@ void RandomWORSelection::reset() {
 
 shared_ptr <Selection> RandomWORSelection::clone(){
 	shared_ptr <RandomWORSelection> newsel = shared_ptr<RandomWORSelection>(new RandomWORSelection(*this));
-	return dynamic_pointer_cast<Selection, RandomWORSelection>(newsel);
+	return boost::dynamic_pointer_cast<Selection, RandomWORSelection>(newsel);
 }
 
 
@@ -106,3 +108,5 @@ void RandomWORSelection::rejectSelections(){
 	tentative_selections = std::vector<int>();
 }
 
+
+END_NAMESPACE_MW

@@ -59,7 +59,7 @@ namespace mw {
 		
         // these regexes are cached at the object / member level to avoid
         // memory inefficiency at runtime
-        boost::regex r1, r2, r3, r4, u1, strip_it;
+        boost::regex u1, strip_it;
             
         boost::unordered_map< std::string, shared_ptr<Variable> > variable_cache;
         boost::unordered_map< std::pair<std::string, GenericDataType>, shared_ptr<Datum> > data_cache;
@@ -149,7 +149,7 @@ namespace mw {
 			
 			// Split the parent scope so that we can search from inside out
 			vector<string> scope_components;
-			split(scope_components, parent_scope, is_any_of("/"));
+			split(scope_components, parent_scope, boost::algorithm::is_any_of("/"));
 			
 			shared_ptr<T> candidate;
 			
@@ -185,11 +185,11 @@ namespace mw {
             if(obj->isAmbiguous()){
                 //string string_rep = obj->getStringRepresentation();
                 shared_ptr<AmbiguousComponentReference> amb_ref = 
-                            dynamic_pointer_cast<AmbiguousComponentReference, Component>(obj);
+                            boost::dynamic_pointer_cast<AmbiguousComponentReference, Component>(obj);
                 throw AmbiguousComponentReferenceException(amb_ref);
             }
             
-			return dynamic_pointer_cast<T, mw::Component>(obj);
+			return boost::dynamic_pointer_cast<T, mw::Component>(obj);
 		}
 		
 		// Instance lookups with some extra parsing smarts
@@ -200,36 +200,10 @@ namespace mw {
 		
 		// Utility look-ups to centralize commonly used parsing
 		bool getBoolean(std::string expression);
+        Datum getValue(std::string expression, GenericDataType type = M_UNDEFINED);
         Datum getNumber(std::string expression, GenericDataType type = M_FLOAT);
 		boost::filesystem::path getPath(std::string working, 
 										std::string expression);
-		
-        
-        // NOTE
-        // The following forms of these calls are effectively deprecated by the
-        // better exception context accumulations now available.
-        
-        // helpers for instance look-ups that throw meaningful parsing exceptions
-        // (to simplify bulletproofing plugins)
-        // DDC note: conceptually, the map lookup feels like it ought to go outside
-        // of this class, but given that these are utility calls frequently used in 
-        // plugins, the practicallity of the compactness of the call and the 
-        // centralization of the exception throwing would seem to trump purity of design
-        virtual string getValueForAttribute(string attribute,
-                                            map<string, string>& parameters);
-        
-        virtual shared_ptr<Variable> getVariableForAttribute(string attribute,
-                                                             map<string, string>& parameters,
-                                                             string default_expression="");
-        
-        virtual Datum getNumberForAttribute(string attribute,
-                                            map<string, string>& parameters,
-                                            GenericDataType datatype = M_FLOAT);
-        
-        virtual Datum getNumberForAttribute(string attribute,
-                                            map<string, string>& parameters,
-                                            Datum default_value,
-                                            GenericDataType datatype = M_FLOAT);
         
         Datum getComponentCodec(){
 			

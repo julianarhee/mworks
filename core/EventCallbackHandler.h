@@ -28,9 +28,7 @@
 
 #include "Event.h"
 
-using namespace boost;
-using namespace std;
-using namespace __gnu_cxx;
+using std::string;
 
 
 BEGIN_NAMESPACE_MW
@@ -39,7 +37,7 @@ BEGIN_NAMESPACE_MW
 typedef boost::function<void(shared_ptr<Event>)>  EventCallback;
 
 // simple convenience class
-class KeyedEventCallbackPair : public enable_shared_from_this<KeyedEventCallbackPair>{
+class KeyedEventCallbackPair : public boost::enable_shared_from_this<KeyedEventCallbackPair>{
 
 protected:
     
@@ -61,10 +59,10 @@ public:
 #ifdef  USE_HASH_MAP_IN_CALLBACK_HANDLER
 typedef hash_multimap<int, KeyedEventCallbackPair>  EventCallbackMap;
 #else
-typedef multimap<int, KeyedEventCallbackPair> EventCallbackMap;
+typedef std::multimap<int, KeyedEventCallbackPair> EventCallbackMap;
 #endif
 
-typedef multimap<string, int>      EventCallbackKeyCodeMap;
+typedef std::multimap<string, int>      EventCallbackKeyCodeMap;
 
 #define DEFAULT_CALLBACK_KEY    "<default>"
 #define ALWAYS_CALLBACK_KEY     -1

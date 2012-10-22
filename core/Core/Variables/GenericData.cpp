@@ -11,21 +11,17 @@
  * Copyright (c) 2005 MIT. All rights reserved.
  */
 
-// TEMP
-#include "EmbeddedPerlInterpreter.h"
-// ENDTEMP
-
-
 #include "GenericData.h"
 #include "Utilities.h"
 #include "ScarabServices.h"
 #include <string>
 #include <sstream>
 
-using namespace mw;
-using namespace std;
-
 #include "ExpressionParser.h"
+
+
+BEGIN_NAMESPACE_MW
+
 
 void Datum::initScarabDatum(){
   // TODO, this could cause a shitload of memory leaks
@@ -154,7 +150,7 @@ Datum::Datum(const Datum& that) {
   
   #if INTERNALLY_LOCKED_MDATA
 	lock();
-  #endif;
+  #endif
   
   data = NULL;
 
@@ -237,6 +233,14 @@ Datum::Datum(ScarabDatum * datum) {
   case SCARAB_FLOAT:
     setDataType(M_FLOAT);
     break;
+  case SCARAB_FLOAT_INF:
+    setDataType(M_FLOAT);
+    setFloat(INFINITY);
+    return;
+  case SCARAB_FLOAT_NAN:
+    setDataType(M_FLOAT);
+    setFloat(NAN);
+    return;
   case SCARAB_FLOAT_OPAQUE:
 	//       Dave: How did we end up with all of this bullshit anyways?
 	//       Ben:  I don't know, so I just deleted it.
@@ -355,7 +359,7 @@ double Datum::getFloat() const {
 	
 	#if INTERNALLY_LOCKED_MDATA
 		lock();
-	#endif;
+	#endif
 
 	if(data == NULL){
 		mwarning(M_SYSTEM_MESSAGE_DOMAIN,
@@ -390,7 +394,7 @@ double Datum::getFloat() const {
 long Datum::getInteger() const{
   #if INTERNALLY_LOCKED_MDATA
 	lock();
-  #endif;
+  #endif
   
   if(data == NULL){
     mwarning(M_SYSTEM_MESSAGE_DOMAIN,
@@ -426,7 +430,7 @@ const char * Datum::getString() const{
   
   #if INTERNALLY_LOCKED_MDATA
 	lock();
-  #endif;
+  #endif
   
   const char *result;
   
@@ -449,7 +453,7 @@ int Datum::getStringLength()  const{
   
   #if INTERNALLY_LOCKED_MDATA
 	lock();
-  #endif;
+  #endif
   
   int result = 0;
   
@@ -472,7 +476,7 @@ void Datum::setBool(bool newdata) {
   
   #if INTERNALLY_LOCKED_MDATA
 	lock();
-  #endif;
+  #endif
   
   datatype = M_BOOLEAN;
   if(data != NULL){
@@ -488,7 +492,7 @@ void Datum::setBool(bool newdata) {
 void Datum::setInteger(long long newdata) {
   #if INTERNALLY_LOCKED_MDATA
 	lock();
-  #endif;
+  #endif
   datatype = M_INTEGER;
   if(data != NULL){
     scarab_free_datum(data);
@@ -502,7 +506,7 @@ void Datum::setInteger(long long newdata) {
 void Datum::setFloat(double newdata) {
   #if INTERNALLY_LOCKED_MDATA
 	lock();
-  #endif;
+  #endif
   datatype = M_FLOAT;
   
   if(data != NULL){
@@ -518,7 +522,7 @@ void Datum::setFloat(double newdata) {
 void Datum::setString(const char * newdata, int size) {
   #if INTERNALLY_LOCKED_MDATA
 	lock();
-  #endif;
+  #endif
   datatype = M_STRING;
 
   if(data != NULL){
@@ -544,7 +548,7 @@ void Datum::setString(const char * newdata, int size) {
 void Datum::setString(std::string newdata) {
   #if INTERNALLY_LOCKED_MDATA
 	lock();
-  #endif;
+  #endif
   datatype = M_STRING;
 
   if(data != NULL){
@@ -583,7 +587,7 @@ Datum& Datum::operator=(const Datum& that) {
 
   #if INTERNALLY_LOCKED_MDATA
 	lock();
-  #endif;
+  #endif
   
   setDataType(that.getDataType());
 
@@ -963,18 +967,16 @@ Datum Datum::operator==(const Datum& other)  const{
 			return Datum(M_BOOLEAN, false);
 	} else if(isDictionary()) {
 		if(other.isDictionary() && (getNElements() == other.getNElements())) {
-			for(int i=0; i<getMaxElements(); i++) {
-			 Datum key(getKey(i));
+            std::vector<Datum> keys = getKeys();
+			for (int i = 0; i < keys.size(); i++) {
+                Datum key(keys[i]);
 				
-				if(!key.isUndefined()) {
-				 Datum val1, val2;
-					val1 = getElement(key);
-					val2 = other.getElement(key);
-
-					if(val1 != val2) {
-						return Datum(M_BOOLEAN, false);
-					}
-				}
+                Datum val1 = getElement(key);
+                Datum val2 = other.getElement(key);
+                
+                if (val1 != val2) {
+                    return Datum(M_BOOLEAN, false);
+                }
 			}
 			return Datum(M_BOOLEAN, true);
 		} else {
@@ -1197,7 +1199,7 @@ int Datum::getNElements() const {
 			returnval =  1;
 			break;
 		case M_DICTIONARY:	
-			returnval = scarab_dict_number_of_elements(data);    
+			returnval = data->data.dict->size;
 			break;
 		case M_LIST:
 			{
@@ -1246,6 +1248,7 @@ int Datum::getMaxElements()  const{
 	return returnval;
 }
 
+/*
 Datum Datum::getKey(const int n)  const {
 
 	if(getDataType() != M_DICTIONARY) {
@@ -1263,7 +1266,7 @@ Datum Datum::getKey(const int n)  const {
 	}
   
 	lockDatum();
-	ScarabDatum ** sd = scarab_dict_keys(data);
+	ScarabDatum ** sd = data->data.dict->keys;
 
 	int n_keys = data->data.dict->tablesize;
   
@@ -1281,6 +1284,7 @@ Datum Datum::getKey(const int n)  const {
 
 	return returnval; 
 }
+ */
 
 std::vector<Datum> Datum::getKeys() const {
 	std::vector<Datum> keys;
@@ -1291,14 +1295,17 @@ std::vector<Datum> Datum::getKeys() const {
 	}
 	
 	lockDatum();
-	ScarabDatum ** sd = scarab_dict_keys(data);
+	ScarabDatum ** sd = data->data.dict->keys;
 	
     // DDC: 12/09: I think this should be size, not tablesize
-	//int n_keys = data->data.dict->tablesize;
-	int n_keys = data->data.dict->size;
+    // CJS: 9/12: No, tablesize is correct.  size indicates the number of non-NULL keys in the table; you
+    // have to interate through all tablesize slots to find them.
+	int max_keys = data->data.dict->tablesize;
     
-	for(int i = 0; i<n_keys; ++i) {
-		keys.push_back(sd[i]);
+	for (int i = 0; i < max_keys; ++i) {
+        if (sd[i]) {
+            keys.push_back(sd[i]);
+        }
 	}
 	
 	unlockDatum();
@@ -1420,7 +1427,7 @@ Datum Datum::getElement(const int index)  const{
   
   #if INTERNALLY_LOCKED_MDATA
 	lock();
-  #endif;
+  #endif
   
   //TODO: we could do something clever for M_DICTIONARY here
 	if(getDataType() != M_LIST) {
@@ -1564,4 +1571,4 @@ std::string Datum::toString() const {
 }
 
 
-
+END_NAMESPACE_MW

@@ -22,13 +22,10 @@
 
 #include "AccumulatingConduit.h"
 #include "IPCEventTransport.h"
-#include "DummyEventTransport.h"
 #include "Exceptions.h"
 
 
 namespace mw {
-
-    using namespace std;
     
     
     class PythonEventListCallback : public PythonEventCallback {
@@ -110,10 +107,10 @@ namespace mw {
             shared_ptr<PythonEventListCallback> cb(new PythonEventListCallback(function_object));
             
             // Need to hold the GIL until *after* we create the PythonEventListCallback, since doing so
-            // involves an implicit PyINCREF
+            // involves an implicit Py_INCREF
             ScopedGILRelease sgr;
             
-            shared_ptr<AccumulatingConduit> accumulating_conduit = dynamic_pointer_cast<AccumulatingConduit>(conduit);
+            shared_ptr<AccumulatingConduit> accumulating_conduit = boost::dynamic_pointer_cast<AccumulatingConduit>(conduit);
             accumulating_conduit->registerBundleCallback(bind(&PythonEventListCallback::callback, cb, _1));
         }
 
@@ -143,11 +140,6 @@ namespace mw {
                                                                                                                 _end_evt,
                                                                                                                 _events_to_watch){}    
     };
-    
-    
-    
-    extern PyObject *convert_scarab_to_python(ScarabDatum *datum);
-    extern PyObject *convert_datum_to_python(Datum datum);
     
 
     

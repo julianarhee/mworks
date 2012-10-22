@@ -12,11 +12,6 @@
 #include "Event.h"
 #include "ComponentRegistry.h"
 
-using namespace mw;
-
-
-
-
 
 //******************************************************************
 //******************************************************************
@@ -33,9 +28,14 @@ using namespace mw;
 #import <IOKit/graphics/IOGraphicsTypes.h>
 #import "StateSystem.h"
 
+
+BEGIN_NAMESPACE_MW
+
+
 //#define kDefaultDisplay 1
 
 
+/*
 // TODO: this may make more sense if it were in the stimDisplay class instead
 //		 since multiple displays will have different VBLs etc. etc.
 //		 This is currently just hacked in to show how it is done and to use
@@ -72,6 +72,7 @@ void *announce_beam_position(void *arg){
 	
 	return NULL;
 }
+ */
 
 
 
@@ -89,7 +90,6 @@ OpenGLContextManager::OpenGLContextManager() {
     
     contexts = [[NSMutableArray alloc] init];
     
-    has_fence = false;
     glew_initialized = false;
     
     main_display_index = -1;
@@ -328,13 +328,6 @@ int OpenGLContextManager::newFullscreenContext(int screen_number){
     setCurrent(context_id);
     _initGlew();
     
-    glGenFencesAPPLE(1, &synchronization_fence);
-    if(glIsFenceAPPLE(synchronization_fence)){
-        has_fence = true;
-    } else {
-        has_fence = false;
-    }
-    
     if (kIOPMNullAssertionID == display_sleep_block) {
         if (kIOReturnSuccess != IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep,
                                                             kIOPMAssertionLevelOn,
@@ -409,7 +402,6 @@ void OpenGLContextManager::flush(int context_id, bool update) {
         return;
     }
     
-	//glSetFenceAPPLE(synchronization_fence);
     if(update){
         [[contexts objectAtIndex:context_id] update];
     }
@@ -417,7 +409,8 @@ void OpenGLContextManager::flush(int context_id, bool update) {
     
 }
 
-namespace mw {
-	SINGLETON_INSTANCE_STATIC_DECLARATION(OpenGLContextManager)
-}
 
+SINGLETON_INSTANCE_STATIC_DECLARATION(OpenGLContextManager)
+
+
+END_NAMESPACE_MW

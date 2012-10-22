@@ -9,7 +9,6 @@
 
 
 #include "ExperimentPackager.h"
-#include "EmbeddedPerlInterpreter.h"
 #include "Scarab/scarab.h"
 #include "Utilities.h"
 #include "LoadingUtilities.h"
@@ -20,7 +19,10 @@
 #include "PlatformDependentServices.h"
 #include "boost/filesystem/path.hpp"
 #include "boost/algorithm/string/replace.hpp"
-using namespace mw;
+
+
+BEGIN_NAMESPACE_MW
+
 
 Datum
 ExperimentPackager::packageSingleFile(const boost::filesystem::path filepath, const std::string filename) {
@@ -33,11 +35,11 @@ ExperimentPackager::packageSingleFile(const boost::filesystem::path filepath, co
 	name.setString(filename.c_str(), filename.length()+1);
 	
 
-	ifstream mediaFile;
-	mediaFile.open(filepath.string().c_str(), ios::binary);
+	std::ifstream mediaFile;
+	mediaFile.open(filepath.string().c_str(), std::ios::binary);
 	
 	// get length of file:
-	mediaFile.seekg(0, ios::end);
+	mediaFile.seekg(0, std::ios::end);
 	int length = mediaFile.tellg();
 	// if the file was never opened
 	if(length <= 0) { 
@@ -48,7 +50,7 @@ ExperimentPackager::packageSingleFile(const boost::filesystem::path filepath, co
 	
 	char * buffer = new char[length];
 	
-	mediaFile.seekg(0, ios::beg);
+	mediaFile.seekg(0, std::ios::beg);
 	mediaFile.read(buffer, length);
 	mediaFile.close();
 	
@@ -146,6 +148,9 @@ void IncludedFilesParser::_processCreateDirective(xmlNode *node) {
         child = child->next;
     }
 }
+
+
+END_NAMESPACE_MW
 
 
 

@@ -11,6 +11,7 @@
 #ifndef _GENERIC_DATA_H
 #define _GENERIC_DATA_H
 
+#include "MWorksMacros.h"
 #include "MWorksTypes.h"
 #include "ScarabServices.h"
 #include "Lockable.h"
@@ -27,9 +28,15 @@
 #include <boost/archive/basic_binary_oprimitive.hpp>
 #include <boost/archive/basic_binary_iprimitive.hpp>
 #include "Serialization.h"
-namespace mw {
-	
-    using namespace std;
+
+using std::map;
+using std::pair;
+using std::string;
+using std::vector;
+
+
+BEGIN_NAMESPACE_MW
+
     
 #define M_NO_DATA   0      // JJD added Aug 16, 2005
 	
@@ -231,7 +238,6 @@ namespace mw {
 			int getMaxElements() const;
 			
 			bool hasKey(const Datum &key) const;
-            Datum getKey(const int n)  const;
 			std::vector<Datum> getKeys() const;
 			
 			
@@ -270,8 +276,9 @@ namespace mw {
 				double fval;
 				bool bval;
 				std::string sval;
-				int nelements;
                 int string_length;
+				int nelements;
+                std::vector<Datum> keys;
                 
 				ar << datatype;
 				switch(datatype){
@@ -310,8 +317,9 @@ namespace mw {
 					case M_DICTIONARY:
                         nelements = getNElements();
                         ar << nelements;
-                        for(int i = 0; i < nelements; i++){
-                            Datum key = getKey(i);
+                        keys = getKeys();
+                        for(int i = 0; i < keys.size(); i++){
+                            Datum key = keys[i];
                             ar << key;
                             Datum val = getElement(key);
                             ar << val;
@@ -414,7 +422,9 @@ namespace mw {
 		 Datum removeElement(const char * key) { return Datum(); }
 			
 		};
-		
-	}
+
+
+END_NAMESPACE_MW
+
+
 #endif
-	

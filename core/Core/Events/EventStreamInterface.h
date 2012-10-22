@@ -30,16 +30,13 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <map>
-#include <ext/hash_map>
 
 #include "EventCallbackHandler.h"
 
 namespace mw {
 
-using namespace std;
 
-
-class EventStreamInterface : public EventCallbackHandler, public enable_shared_from_this<EventStreamInterface> {
+class EventStreamInterface : public EventCallbackHandler, public boost::enable_shared_from_this<EventStreamInterface> {
     
 protected:
     

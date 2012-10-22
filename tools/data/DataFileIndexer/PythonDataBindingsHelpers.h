@@ -17,7 +17,9 @@
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
-#include <python.h>
+#include <Python.h>
+
+#include "PythonDataHelpers.h"
 
 using namespace boost;
 namespace bp = boost::python;
@@ -25,6 +27,7 @@ namespace bp = boost::python;
 class PythonDataFile {
     std::string file_name;
     shared_ptr<dfindex> indexer;
+    shared_ptr<DataFileIndexer::EventsIterator> eventsIterator;
     
     
 public:
@@ -42,19 +45,12 @@ public:
     std::string file();
     std::string true_mwk_file();
     
-    MWorksTime minimum_time();
-    MWorksTime maximum_time();
+    MWTime minimum_time();
+    MWTime maximum_time();
     
-    std::vector<EventWrapper> test_function(int number);    
-    
-    std::vector<EventWrapper> fetch_all_events();
-    
-    std::vector<EventWrapper> fetch_events1(bp::list codes);    
-    std::vector<EventWrapper> fetch_events2(bp::list codes, const MWorksTime lower_bound);    
-    
-    std::vector<EventWrapper> fetch_events3(bp::list codes,
-                                            const MWorksTime lower_bound, 
-                                            const MWorksTime upper_bound);
+    void select_events(bp::list codes, const MWTime lower_bound, const MWTime upper_bound);
+    shared_ptr<EventWrapper> get_next_event();
+    std::vector<EventWrapper> get_events();
 };
 
 
@@ -86,11 +82,6 @@ public:
     int write_event(shared_ptr<EventWrapper> e);
 
 };    
-
-// Convert a ScarabDatum into a corresponding Python object
-extern PyObject *convert_scarab_to_python(ScarabDatum *datum, int prev_typ = -1);
-// vice versa
-extern ScarabDatum *convert_python_to_scarab(PyObject *pObj);
 
 
 extern PyObject *extract_event_value(EventWrapper e);

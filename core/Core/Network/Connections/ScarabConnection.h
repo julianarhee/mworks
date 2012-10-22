@@ -24,7 +24,7 @@
 
 #include "boost/enable_shared_from_this.hpp"
 namespace mw {
-class ScarabConnection : public enable_shared_from_this<ScarabConnection> {
+class ScarabConnection : public boost::enable_shared_from_this<ScarabConnection> {
     protected:
 	boost::mutex connectLock;
 	boost::mutex interruptLock;
@@ -47,6 +47,8 @@ class ScarabConnection : public enable_shared_from_this<ScarabConnection> {
 	ScarabConnection(ScarabConnection& ref) { }
 	void operator=(ScarabConnection& ref) { }
 	ScarabConnection() { }
+    
+    void* terminate();
 
     public:
         

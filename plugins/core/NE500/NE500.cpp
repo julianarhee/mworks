@@ -27,7 +27,7 @@ void NE500PumpNetworkDevice::addChild(std::map<std::string, std::string> paramet
 										ComponentRegistry *reg,
 										shared_ptr<Component> _child){
 
-	shared_ptr<NE500DeviceChannel> channel = dynamic_pointer_cast<NE500DeviceChannel, Component>(_child);
+	shared_ptr<NE500DeviceChannel> channel = boost::dynamic_pointer_cast<NE500DeviceChannel, Component>(_child);
 	if(channel == NULL){
 		throw SimpleException("Attempt to access an invalid NE500 channel object");
 	}
@@ -43,7 +43,7 @@ void NE500PumpNetworkDevice::addChild(std::map<std::string, std::string> paramet
 	
 	shared_ptr<Variable> var = channel->getVariable();
 	
-	weak_ptr<NE500PumpNetworkDevice> weak_self_ref(getSelfPtr<NE500PumpNetworkDevice>());
+	weak_ptr<NE500PumpNetworkDevice> weak_self_ref(component_shared_from_this<NE500PumpNetworkDevice>());
 	shared_ptr<VariableNotification> notif(new NE500DeviceOutputNotification(weak_self_ref, weak_ptr<NE500DeviceChannel>(channel)));
 	var->addNotification(notif);
 }

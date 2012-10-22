@@ -24,9 +24,10 @@
 
 #import <Foundation/Foundation.h>
 
-using namespace mw;
 
-namespace mw {
+BEGIN_NAMESPACE_MW
+
+
 	void XMLParser::error_func(void * _parser_context, const char * error, ...){
 		
 		va_list ap;
@@ -47,7 +48,6 @@ namespace mw {
         }
 		//cerr << buffer << endl;
 	}
-}
 
 
 void XMLParser::setup(shared_ptr<ComponentRegistry> _reg, std::string _path, std::string _simplification_transform_path){
@@ -396,21 +396,24 @@ void XMLParser::_processRangeReplicator(xmlNode *node){
 
 void XMLParser::_generateRangeReplicatorValues(xmlNode *node, vector<string> &values) {
     const int numParams = 3;
-    
-    vector<string> paramStrings(numParams);
-	paramStrings[0] = _attributeForName(node, "from");
-	paramStrings[1] = _attributeForName(node, "to");
-	paramStrings[2] = _attributeForName(node, "step");
+    const char* paramNames[] = { "from", "to", "step" };
     
     vector<double> params(numParams);
     for (int i = 0; i < numParams; i++) {
-        try {
-            params[i] = boost::lexical_cast<double>(paramStrings[i]);
-        } catch (bad_lexical_cast &) {
+        string paramString(_attributeForName(node, paramNames[i]));
+        Datum paramValue = registry->getValue(paramString, M_FLOAT);
+        if (!paramValue.isNumber()) {
             throw InvalidXMLException(_attributeForName(node, "reference_id"),
-                                      "Non-numeric parameter in range replicator",
-                                      paramStrings[i]);
+                                      string("Range replicator parameter \"") + paramNames[i] +
+                                      string("\" has a non-numeric value"),
+                                      paramValue.toString());
         }
+        params[i] = paramValue.getFloat();
+    }
+    
+    if (params[2] <= 0.0) {
+        throw InvalidXMLException(_attributeForName(node, "reference_id"),
+                                  "Range replicator step must be greater than zero");
     }
 	
 	for (double v = params[0]; v <= params[1]; v += params[2]) {
@@ -783,7 +786,7 @@ void XMLParser::_processGenericCreateDirective(xmlNode *node, bool anon){
                 // Copy existing exception's data to f
                 f = dynamic_cast<FatalParserException &>(e);
             } else {
-                stringstream error_msg;
+                std::stringstream error_msg;
                 error_msg << "Failed to create object. ";
                 if (have_alt) {
                     error_msg << 
@@ -842,7 +845,7 @@ void XMLParser::_processInstanceDirective(xmlNode *node){
 	// If the object is a valid variable environment, we'll apply variable
 	// assignments if there are any
 	// Look for variable assignments if appropriate
-	shared_ptr<ScopedVariableEnvironment> env = dynamic_pointer_cast<ScopedVariableEnvironment, mw::Component>(alias);
+	shared_ptr<ScopedVariableEnvironment> env = boost::dynamic_pointer_cast<ScopedVariableEnvironment, mw::Component>(alias);
 	if(env != NULL){
 		
 		xmlNode *alias_child = node->children;
@@ -866,7 +869,7 @@ void XMLParser::_processInstanceDirective(xmlNode *node){
 											  "Invalid value", content);
 				} 
 				
-				shared_ptr<ScopedVariable> svar = dynamic_pointer_cast<ScopedVariable, Variable>(var);
+				shared_ptr<ScopedVariable> svar = boost::dynamic_pointer_cast<ScopedVariable, Variable>(var);
 				
 				if(svar == NULL){
 					// TODO: better throw
@@ -1361,3 +1364,5 @@ void XMLParser::_processVariableAssignment(xmlNode *node){
 	variable->setValue(value);
 }
 
+
+END_NAMESPACE_MW

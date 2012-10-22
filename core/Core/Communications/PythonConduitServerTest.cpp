@@ -19,14 +19,15 @@
  *
  */
 
-#include "DummyEventTransport.h"
 #include "IPCEventTransport.h"
 #include "CodecAwareConduit.h"
 #include "StandardSystemEventHandler.h"
 #include "StandardVariables.h"
 #include "EventStreamConduit.h"
 
-using namespace mw;
+
+BEGIN_NAMESPACE_MW
+
 
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( PythonConduitServerTestFixture, "Unit Test" );
 
@@ -106,3 +107,5 @@ void PythonConduitServerTestFixture::testInOneThread(){
 
 }
 
+
+END_NAMESPACE_MW

@@ -10,26 +10,24 @@
 #ifndef STIMULUS_DISPLAY_H_
 #define STIMULUS_DISPLAY_H_
 
+#include <map>
+#include <vector>
+
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
-
 #include <CoreVideo/CVDisplayLink.h>
 
+#include <boost/noncopyable.hpp>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/condition_variable.hpp>
 
 #include "Clock.h"
 #include "LinkedList.h"
-#include <vector>
-#include "boost/enable_shared_from_this.hpp"
 
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
-#include <boost/thread/shared_mutex.hpp>
-#include <boost/thread/barrier.hpp>
-#include <boost/thread/condition_variable.hpp>
 
 namespace mw {
-	using namespace boost;
-	
 	// forward declarations
     class Datum;
 	class Stimulus;
@@ -57,8 +55,8 @@ namespace mw {
 		
   
 	
-	class StimulusDisplay : public enable_shared_from_this<StimulusDisplay> {
-      protected:
+	class StimulusDisplay : public boost::enable_shared_from_this<StimulusDisplay>, boost::noncopyable {
+    protected:
         std::vector<int> context_ids;
 		int current_context_index;
 		shared_ptr< LinkedList<StimulusNode> > display_stack;
@@ -66,33 +64,42 @@ namespace mw {
         shared_ptr<Clock> clock;
         shared_ptr<OpenGLContextManager> opengl_context_manager;
 		
-		boost::shared_mutex display_lock;
-        typedef boost::shared_lock<boost::shared_mutex> shared_lock;
-        typedef boost::upgrade_lock<boost::shared_mutex> upgrade_lock;
-        typedef boost::upgrade_to_unique_lock<boost::shared_mutex> upgrade_to_unique_lock;
-        boost::barrier refreshSync;
-        boost::condition_variable_any refreshCond;
+		boost::mutex display_lock;
+        typedef boost::mutex::scoped_lock unique_lock;
+        boost::condition_variable refreshCond;
         bool waitingForRefresh;
 
         bool needDraw;
 		
 		GLdouble left, right, top, bottom; // display bounds
+        GLclampf backgroundRed, backgroundGreen, backgroundBlue;  // background color
         
         shared_ptr<VariableCallbackNotification> stateSystemNotification;
         CVDisplayLinkRef displayLink;
+        double mainDisplayRefreshRate;
         int64_t lastFrameTime;
         MWTime currentOutputTimeUS;
         
         std::vector< shared_ptr<StimulusNode> > stimsToAnnounce;
         std::vector<Datum> stimAnnouncements;
+        
+        const bool drawEveryFrame;
+        std::map<int, GLuint> framebuffers;
+        std::map<int, GLuint> renderbuffers;
+        std::map<int, GLint> bufferWidths, bufferHeights;
+        
+        void setMainDisplayRefreshRate();
+        void allocateBufferStorage(int contextIndex);
+        void storeBackBuffer(int contextIndex);
+        void drawStoredBuffer(int contextIndex);
 		
         virtual void glInit();
 		virtual void setDisplayBounds();
         void refreshDisplay();
         void drawDisplayStack(bool doStimAnnouncements);
-        void ensureRefresh(upgrade_lock &lock);
+        void ensureRefresh(unique_lock &lock);
 
-        static void announceDisplayUpdate(void *_display);
+        void announceDisplayUpdate();
         void announceDisplayStack(MWTime time);
         Datum getAnnounceData();
 
@@ -106,10 +113,10 @@ namespace mw {
 		
       public:
 		
-		StimulusDisplay();
+		explicit StimulusDisplay(bool drawEveryFrame);
 		~StimulusDisplay();
         
-        virtual void initialize();
+        //virtual void initialize();
 		
 		void addContext(int _context_id);
 		
@@ -121,10 +128,11 @@ namespace mw {
         shared_ptr<StimulusNode> addStimulus(shared_ptr<Stimulus> stim);
 		void addStimulusNode(shared_ptr<StimulusNode> stimnode);
 		
+        void setBackgroundColor(GLclampf red, GLclampf green, GLclampf blue);
 		void updateDisplay();
 		void clearDisplay();
         void getDisplayBounds(GLdouble &left, GLdouble &right, GLdouble &bottom, GLdouble &top);
-        double getMainDisplayRefreshRate();
+        double getMainDisplayRefreshRate() const { return mainDisplayRefreshRate; }
         MWTime getCurrentOutputTimeUS() const { return currentOutputTimeUS; }
         
         static shared_ptr<StimulusDisplay> getCurrentStimulusDisplay();
@@ -142,7 +150,7 @@ namespace mw {
                 
 	  private:
         GLdouble degrees_per_screen_unit;
-        StimulusDisplay(const StimulusDisplay& s) : refreshSync(2) { }
+        //StimulusDisplay(const StimulusDisplay& s) : refreshSync(2) { }
         void operator=(const StimulusDisplay& l) { }
     };
 
@@ -161,7 +169,7 @@ namespace mw {
 
       public:
     
-        VirtualTangentScreenDisplay();
+        VirtualTangentScreenDisplay(bool drawEveryFrame);
 
         virtual void translate2D(double x_deg, double y_deg);	
         virtual void rotateInPlane2D(double rot_angle_deg);
@@ -171,8 +179,8 @@ namespace mw {
         virtual void scale2D_screenUnits(double x_size, double y_size);
         
 	  private:
-        VirtualTangentScreenDisplay(const VirtualTangentScreenDisplay& s);
-        void operator=(const VirtualTangentScreenDisplay& l) { }
+//        VirtualTangentScreenDisplay(const VirtualTangentScreenDisplay& s);
+//        void operator=(const VirtualTangentScreenDisplay& l) { }
     };
     
 }

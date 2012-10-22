@@ -16,10 +16,9 @@
 #include "EventConstants.h"
 #include <boost/shared_ptr.hpp>
 
-namespace mw{
+using std::string;
 
-using namespace boost;
-using namespace std;
+namespace mw{
 
 class VariableRegistryInterface {
  

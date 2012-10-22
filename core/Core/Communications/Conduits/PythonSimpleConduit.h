@@ -15,12 +15,13 @@
 
 #include "CodecAwareConduit.h"
 #include "IPCEventTransport.h"
-#include "DummyEventTransport.h"
 #include "Exceptions.h"
 
 #include "Clock.h"
 #include "CoreBuilderForeman.h"
 #include "StandardServerCoreBuilder.h"
+
+#include "PythonDataHelpers.h"
 
 using namespace boost::python;
 
@@ -156,7 +157,7 @@ public:
         shared_ptr<PythonEventCallback> callback(new PythonEventCallback(function_object));
         
         // Need to hold the GIL until *after* we create the PythonEventCallback, since doing so
-        // involves an implicit PyINCREF
+        // involves an implicit Py_INCREF
         ScopedGILRelease sgr;
         
         conduit->registerCallback(code, bind(&PythonEventCallback::callback, callback, _1));
@@ -167,7 +168,7 @@ public:
         shared_ptr<PythonEventCallback> cb(new PythonEventCallback(function_object));
         
         // Need to hold the GIL until *after* we create the PythonEventCallback, since doing so
-        // involves an implicit PyINCREF
+        // involves an implicit Py_INCREF
         ScopedGILRelease sgr;
         
         conduit->registerCallbackByName(event_name, bind(&PythonEventCallback::callback, cb, _1));
@@ -221,57 +222,20 @@ public:
     
     
     virtual mw::Datum packagePyObject(PyObject *pyobj){
-    
-        if(PyFloat_Check(pyobj)){
-            return mw::Datum(PyFloat_AsDouble(pyobj));
-        } else if(PyInt_Check(pyobj)){
-            return mw::Datum(PyInt_AsLong(pyobj));
-        } else if(PyString_Check(pyobj)){
-            return mw::Datum(PyString_AsString(pyobj));
-        } else if(PyMapping_Check(pyobj)){
-            return packagePyMapping(pyobj);
-        } else if(PySequence_Check(pyobj)){
-            return packagePySequence(pyobj);
-        }
-
-        return mw::Datum();
-    }
-           
-    virtual mw::Datum packagePySequence(PyObject *pyobj){
-        
-        int size = PySequence_Size(pyobj);
-        mw::Datum list_datum(M_LIST, size);
-        
-        for(int i = 0; i < size; i++){
-            list_datum.addElement(packagePyObject(PySequence_GetItem(pyobj, i)));
-        }
-        
-        return list_datum;
-    }
-     
-    virtual mw::Datum packagePyMapping(PyObject *pyobj){
-        
-        int size = PyMapping_Size(pyobj);
-        
-        mw::Datum dict_datum(M_DICTIONARY, size);
-        
-        PyObject *keys = PyMapping_Keys(pyobj);
-        PyObject *items = PyMapping_Items(pyobj);
-        
-        for(int i = 0; i < size; i++){
-            PyObject *key = PySequence_GetItem(keys,i);
-            PyObject *item = PySequence_GetItem(items, i);
-            
-            dict_datum.setElement(packagePyObject(key), packagePyObject(item));
-        }
-        
-        return dict_datum;
+        ScarabDatum *scarabDatum = convert_python_to_scarab(pyobj);
+        mw::Datum datum(scarabDatum);
+        scarab_free_datum(scarabDatum);
+        return datum;
     }
     
     virtual void sendPyObject(int code, PyObject *pyobj){
+        Datum data = packagePyObject(pyobj);
+        
+        // Need to hold the GIL until *after* we convert the object
         ScopedGILRelease sgr;
+        
         if(conduit != NULL){
-            conduit->sendData(code, packagePyObject(pyobj));
+            conduit->sendData(code, data);
         } else {
             throw SimpleException("Invalid conduit");
         }
@@ -320,10 +284,11 @@ public:
 
 
     
-extern PyObject *convert_scarab_to_python(ScarabDatum *datum);
-extern PyObject *convert_datum_to_python(Datum datum);
-    
-    
+inline PyObject *convert_datum_to_python(const Datum &datum) {
+    return convert_scarab_to_python(datum.getScarabDatum());
+}
+
+
 END_NAMESPACE_MW
 
 

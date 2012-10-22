@@ -247,6 +247,11 @@ Datum _getNumber(const string &expression, const GenericDataType type);
 
 - (void)waitForExperimentToEnd:(NSTimer *)the_timer {
 	if(self.experimentEnded || self.asserted) {
+        if (!self.asserted) {
+            // Give the MWorks threads some time to finish their business
+            [NSThread sleepForTimeInterval:5];
+        }
+        
 		if(!self.asserted && ([self.expectedMessages count] > 0 || [self.expectedEvents count] > 0)) {
 			if([self.expectedMessages count] > 0) {
 				[self marionetteAssert:[NSString stringWithFormat:@"not all required messages were recevied in the proper order.  Next expected: %@", [[self.expectedMessages objectAtIndex:0] message]]]; 
@@ -413,6 +418,7 @@ Datum _getNumber(const string &expression, const GenericDataType type);
 					case M_START_EXPERIMENT:
 					case M_STOP_EXPERIMENT:
 					case M_PAUSE_EXPERIMENT:
+					case M_RESUME_EXPERIMENT:
 					case M_SAVE_VARIABLES:
 					case M_LOAD_VARIABLES:
 					case M_OPEN_DATA_FILE:
@@ -424,7 +430,7 @@ Datum _getNumber(const string &expression, const GenericDataType type);
 					case M_USER_DEFINED:
 						break;
 					default:
-						[self marionetteAssert:[NSString stringWithFormat:@"illeagal #system type: %d", sys_event_type.getInteger()]]; 
+						[self marionetteAssert:[NSString stringWithFormat:@"illeagal #system type: %ld", sys_event_type.getInteger()]];
 						break;
 				}
 			}
@@ -469,6 +475,10 @@ Datum _getNumber(const string &expression, const GenericDataType type);
 				break;
 			case RUNNING:
 				self.stateSystemRunning = YES;								
+				break;
+			case PAUSED:
+				[self marionetteAssert:self.stateSystemRunning
+						   withMessage:@"stateSystemRunning is false"]; 
 				break;
 			default:
 				[self marionetteAssert:@"illegal state_system_mode value"]; 
@@ -755,8 +765,8 @@ Datum _getNumber(const string &expression,
 			return Datum(expression);
 		case M_BOOLEAN:
 			return Datum(boost::lexical_cast<bool>(expression));
+		default:
+			return Datum(expression);
 	}
-	
-	return Datum(expression);
 }	
 
