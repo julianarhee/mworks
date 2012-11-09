@@ -157,14 +157,6 @@ void Experiment::reset(){
 		stimulus_display->clearDisplay();
 	}
 	
-	//variable_registry->reset();
-	//	delete variable_registry;
-	//	variable_registry = new VariableRegistry();
-	//	initializeStandardVariables(variable_registry);
-	//	global_variable_registry = variable_registry;
-	
-	
-	
 	// issue an event that the experiment has stopped
 	global_outgoing_event_buffer->putEvent(SystemEventFactory::currentExperimentState());
 }

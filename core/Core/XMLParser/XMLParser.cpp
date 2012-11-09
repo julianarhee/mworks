@@ -244,7 +244,7 @@ void XMLParser::parse(bool announce_progress){
 	
 	xmlDoc *simplified = xsltApplyStylesheet(simplification_transform, xml_doc, params);
 	
-	//xmlDocDump(stderr, simplified);
+	xmlDocDump(stderr, simplified);
 	xmlNode *root_element = xmlDocGetRootElement(simplified);
 	
 	// TODO: check the root node to make sure it is okay

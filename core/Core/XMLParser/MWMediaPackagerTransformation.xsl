@@ -1,23 +1,11 @@
 <xsl:stylesheet version = '1.0'
 	xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>
-		
+
+    <!-- Just do the bare minimum required to figure out what files need to be packaged -->
+
 	<xsl:template match="/">
 		<xsl:element name="mw_unrolled">
-			<!--<xsl:apply-templates mode="experiment_create"/>
-			<xsl:apply-templates mode="variable_create"/>
-			
-			<xsl:apply-templates mode="variable_assignment"/>
-			
-			<xsl:apply-templates mode="iodevice_create"/>
-			<xsl:apply-templates mode="iochannel_create"/>
-			
-			<xsl:apply-templates mode="experiment_finalize"/>
-			
-			<xsl:apply-templates mode="iodevice_connect"/>
-			<xsl:apply-templates mode="iodevice_finalize"/>
-			
-			
-			<xsl:apply-templates mode="variable_transformers_create"/> -->
+
 			
 			<xsl:apply-templates mode="stimulus_group_create"/>
 			<xsl:apply-templates mode="stimulus_create"/>
@@ -25,25 +13,6 @@
 			
 			<xsl:apply-templates mode="sound_create"/>
 			
-      <!--<xsl:apply-templates mode="list_create"/>
-			<xsl:apply-templates mode="task_system_state_create"/>
-			
-			<xsl:apply-templates mode="paradigm_component_alias"/>
-			<xsl:apply-templates mode="paradigm_component_range_replicator_alias"/>
-			<xsl:apply-templates mode="paradigm_component_list_replicator_alias"/>
-			
-			<xsl:apply-templates mode="action_create"/>
-			<xsl:apply-templates mode="action_connect"/>
-			<xsl:apply-templates mode="spring_loaded_action_connect"/>
-			
-			<xsl:apply-templates mode="list_connect"/>
-			
-			
-			<xsl:apply-templates mode="transition_create"/>
-			
-			<xsl:apply-templates mode="task_system_state_connect"/>
-			
-			<xsl:apply-templates mode="list_finalize"/>-->
 			
 			<xsl:element name="mw_passthrough">
 				<xsl:apply-templates select="@*|node()" mode="passthrough"/>

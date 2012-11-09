@@ -120,10 +120,23 @@
                 </xsl:attribute>
             </xsl:if>
             
+            <!-- Also include a child element named "xml_cdata" that includes any
+                 CDATA text... (man, I really hate XML) -->
+            <xsl:if test="text() != ''">
+                <xsl:element name="xml_cdata">
+                    <xsl:for-each select="text()"><!--#&lt;![CDATA[-->
+    <xsl:value-of select="."/>
+    <!--#]]&gt;--></xsl:for-each>
+                </xsl:element>
+            </xsl:if>
+            
+            <!-- repackage the attributes as children -->
 			<xsl:for-each select="./@*">
 				<xsl:element name="{name()}"><xsl:value-of select="."/></xsl:element>
 			</xsl:for-each>
-		</xsl:element>
+
+        </xsl:element>
+
 	</xsl:template>
 	
 	<!-- Variable -->

@@ -29,6 +29,7 @@
 #include "BiasMonitor.h"
 #include "StandardComponentFactory.h"
 #include "StandardStimulusFactory.h"
+#include "PythonAction.h"
 
 
 BEGIN_NAMESPACE_MW
@@ -59,7 +60,8 @@ ComponentRegistry::ComponentRegistry() :
 	registerFactory("action/schedule", new ScheduledActionsFactory());
 	registerFactory("action/if", new IfFactory());
 	
-	
+	registerFactory("action/python", new PythonActionFactory());
+    
 	registerFactory("action/assignment", new AssignmentFactory());
 	registerFactory("action/pulse", new PulseFactory());
     registerFactory<StandardComponentFactory, ReportString>();

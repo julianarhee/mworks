@@ -24,6 +24,7 @@
 #import "OpenALContextManager.h"
 #import "OpenGLContextManager.h"
 #include "PlatformDependentServices.h"
+#include "MWPythonEnvironment.h"
 
 
 BEGIN_NAMESPACE_MW
@@ -87,9 +88,11 @@ bool StandardServerCoreBuilder::chooseRealtimeComponents() {
 }
 
 bool StandardServerCoreBuilder::startInterpreters() {
-   // GlobalPerlInterpreter = new PerlInterpreter();
-  //  GlobalPerlInterpreter->evalString(
-  //                            "mprintf(qq(Perl interpreter is online\\n));");
+    shared_ptr<MWPythonEnvironment> python_env(new MWPythonEnvironment());
+    
+    MWPythonEnvironment::registerInstance(python_env);
+    python_env->initialize();
+    
     return true;
 }
 

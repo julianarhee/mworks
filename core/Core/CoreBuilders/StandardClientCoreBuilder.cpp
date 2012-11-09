@@ -15,6 +15,7 @@
 #import "ScarabServices.h"
 #import "StandardVariables.h"
 #include "PlatformDependentServices.h"
+#include "MWPythonEnvironment.h"
 
 
 BEGIN_NAMESPACE_MW
@@ -74,7 +75,6 @@ bool StandardClientCoreBuilder::startInterpreters() {
     //GlobalPerlInterpreter = new PerlInterpreter();
     //GlobalPerlInterpreter->evalString(
     //                          "mprintf(qq(Perl interpreter is online\\n));");
-    return true;
 }
 
 bool StandardClientCoreBuilder::startRealtimeServices() {

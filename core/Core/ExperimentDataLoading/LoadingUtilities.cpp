@@ -183,8 +183,7 @@ BEGIN_NAMESPACE_MW
 		
 		if(global_variable_registry != NULL) {	// exp. already loaded
 			global_variable_registry->reset();
-            //global_variable_registry = shared_ptr<VariableRegistry>(new VariableRegistry(global_outgoing_event_buffer));
-			initializeStandardVariables(global_variable_registry);
+            initializeStandardVariables(global_variable_registry);
 			loadSetupVariables();
 		}
 		
